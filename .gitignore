@@ -1,0 +1,5 @@
+#
+# python
+*.pyc
+# my config
+.idea/
