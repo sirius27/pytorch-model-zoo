@@ -39,3 +39,4 @@ class vgg(Module):
         x = self.dropout(F.relu(self.fc1(x)))
         x = self.dropout(F.relu(self.fc2(x)))
         x = self.softmax(self.fc3(x))
+
