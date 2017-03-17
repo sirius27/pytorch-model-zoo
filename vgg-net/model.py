@@ -26,16 +26,16 @@ class vgg(Module):
         self.fc1 = nn.Linear(512*3*3, 4096)
         self.fc2 = nn.Linear(4096, 4096)
         self.fc3 = nn.Linear(4096, 1000)
-        self.dropout = nn.Dropout(p = 0.5)
+        self.dropout = nn.Dropout(p=0.5)
         self.softmax = nn.Softmax()
 
     # override forward function
-    def forward(self, *x):
+    def forward(self, x):
         x = self.pool(F.relu(self.conv2(F.relu(self.conv1(x)))))
         x = self.pool(F.relu(self.conv4(F.relu(self.conv3(x)))))
         x = self.pool(F.relu(self.conv6(F.relu(self.conv6(F.relu(self.conv5(x)))))))
         x = self.pool(F.relu(self.conv8(F.relu(self.conv8(F.relu(self.conv7(x)))))))
-        x = self.pool(F.relu(self.conv8(F.relu(self.conv8(F.relu(self.conv7(x)))))))
+        x = self.pool(F.relu(self.conv8(F.relu(self.conv8(F.relu(self.conv8(x)))))))
         x = self.dropout(F.relu(self.fc1(x)))
         x = self.dropout(F.relu(self.fc2(x)))
         x = self.softmax(self.fc3(x))
