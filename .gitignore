@@ -6,3 +6,5 @@
 *.pyc
 # my config
 .idea/
+data/
+*.swp
