@@ -37,7 +37,6 @@ def train(nb_epoch):
             inputs, targets = data
             inputs, targets = Variable(inputs), Variable(targets)
             optimizer.zero_grad()
-            print 'type of input is ', type(inputs)
             output = net(inputs)
             loss = criterion(output, targets)
             loss.backward()
