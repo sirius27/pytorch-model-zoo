@@ -1,11 +1,12 @@
 from model import vgg
 from torch.nn import CrossEntropyLoss
-from torch.optim import SGD
+from torch.optim import Adam
 from torch.autograd import Variable
 import torch
 import torchvision
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
+import numpy as np
 
 VERBOSE = True
 BATCH_SIZE = 4
@@ -25,16 +26,19 @@ classes = ('plane', 'car', 'bird', 'cat',
 def imshow(img):
     img = img/2 +0.5
     npimg = img.numpy()
-    plt.imshow(img)
+    plt.imshow(npimg.transpose((1,2,0)))
+    plt.show()
 
 
 def train(nb_epoch):
     net = vgg()
     criterion = CrossEntropyLoss()
-    optimizer = SGD(net.parameters(), lr= 0.0001, momentum=0.9)
+    optimizer = Adam(net.parameters(), lr= 0.0001)
     for epoch in range(nb_epoch):
         running_loss = 0.0
         for i, data in enumerate(trainloader):
+            if i>10:
+                break
             inputs, targets = data
             inputs, targets = Variable(inputs), Variable(targets)
             optimizer.zero_grad()
@@ -43,11 +47,11 @@ def train(nb_epoch):
             loss.backward()
             optimizer.step()
             running_loss += loss.data[0]
-            if VERBOSE:
+            if not VERBOSE:
                 if i%2000 == 1999:
-                    print 'batch %d of epoch %d: loss=%.3f'%(i, epoch, running_loss)
+                    print 'batch %d/%d of epoch %d: loss=%.3f'%(i, len(trainloader), epoch, running_loss)
             else:
-                 print 'batch %d/%d of epoch %d: loss=%.3f'%(i, epoch, running_loss)
+                 print 'batch %d/%d of epoch %d: loss=%.3f'%(i,len(trainloader), epoch, running_loss)
     print 'Finished training'
     return net
 
@@ -60,3 +64,21 @@ def test(net):
         target_classes = [classes[target] for target in targets]
 
 net = train(2)
+
+correct_samples = np.zeros([len(classes),1]).ravel()
+total_samples = np.zeros_like(correct_samples)
+for i,data in enumerate(testloader):
+    if i > 20:
+        break
+    inputs, targets = data
+    inputs, targets = Variable(inputs), Variable(targets)
+    outputs = net(inputs)
+    _, predictions = torch.max(outputs.data, 1)
+    predict_classes = [classes[predictions[i][0]] for i in xrange(BATCH_SIZE)]
+    target_classes = [classes[targets.data[i]] for i in xrange(BATCH_SIZE)]
+    for i in xrange(BATCH_SIZE):
+        if predictions[i][0] == targets.data[i]:
+            correct_samples[targets.data[i]] += 1
+        total_samples[targets.data[i]] += 1
+corrct_rate = [correct/total for correct, total in zip(correct_samples, total_samples)]
+print 'correct rate is ', corrct_rate
