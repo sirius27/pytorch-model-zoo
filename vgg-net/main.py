@@ -23,6 +23,8 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=BATCH_SIZE, shuffle
 classes = ('plane', 'car', 'bird', 'cat',
                'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
+
+
 def imshow(img):
     img = img/2 +0.5
     npimg = img.numpy()
@@ -34,7 +36,8 @@ def train(nb_epoch):
     net = vgg()
     criterion = CrossEntropyLoss()
     optimizer = Adam(net.parameters(), lr= 0.0001)
-    for epoch in range(nb_epoch):
+    for eindex,epoch in enumerate(range(nb_epoch)):
+        start = datetime.datetime.now()
         running_loss = 0.0
         for i, data in enumerate(trainloader):
             if i>10:
@@ -52,6 +55,8 @@ def train(nb_epoch):
                     print 'batch %d/%d of epoch %d: loss=%.3f'%(i, len(trainloader), epoch, running_loss)
             else:
                  print 'batch %d/%d of epoch %d: loss=%.3f'%(i,len(trainloader), epoch, running_loss)
+        end = datetime.datetime.now()
+        print "epoch{0} time:{1}".format(eindex,(start-end).strftime())
     print 'Finished training'
     return net
 
@@ -63,22 +68,31 @@ def test(net):
         predict_classes = [classes[output] for output in outputs]
         target_classes = [classes[target] for target in targets]
 
-net = train(2)
+##redirect output to file
+import datetime
+import sys
+report_file = "report_file_{0}.txt".format(str(datetime.datetime.now()))
+ini_stdout = sys.stdout
+with open(report_file,'w') as file:
+    sys.stdout = file
 
-correct_samples = np.zeros([len(classes),1]).ravel()
-total_samples = np.zeros_like(correct_samples)
-for i,data in enumerate(testloader):
-    if i > 20:
-        break
-    inputs, targets = data
-    inputs, targets = Variable(inputs), Variable(targets)
-    outputs = net(inputs)
-    _, predictions = torch.max(outputs.data, 1)
-    predict_classes = [classes[predictions[i][0]] for i in xrange(BATCH_SIZE)]
-    target_classes = [classes[targets.data[i]] for i in xrange(BATCH_SIZE)]
-    for i in xrange(BATCH_SIZE):
-        if predictions[i][0] == targets.data[i]:
-            correct_samples[targets.data[i]] += 1
-        total_samples[targets.data[i]] += 1
-corrct_rate = [correct/total for correct, total in zip(correct_samples, total_samples)]
-print 'correct rate is ', corrct_rate
+
+    net = train(2)
+
+    correct_samples = np.zeros([len(classes),1]).ravel()
+    total_samples = np.zeros_like(correct_samples)
+    for i,data in enumerate(testloader):
+        if i > 20:
+            break
+        inputs, targets = data
+        inputs, targets = Variable(inputs), Variable(targets)
+        outputs = net(inputs)
+        _, predictions = torch.max(outputs.data, 1)
+        predict_classes = [classes[predictions[i][0]] for i in xrange(BATCH_SIZE)]
+        target_classes = [classes[targets.data[i]] for i in xrange(BATCH_SIZE)]
+        for i in xrange(BATCH_SIZE):
+            if predictions[i][0] == targets.data[i]:
+                correct_samples[targets.data[i]] += 1
+            total_samples[targets.data[i]] += 1
+    corrct_rate = [correct/total for correct, total in zip(correct_samples, total_samples)]
+    print 'correct rate is ', corrct_rate
