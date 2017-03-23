@@ -7,10 +7,11 @@ import torchvision
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 import numpy as np
-
+import time
 VERBOSE = True
 BATCH_SIZE = 4
 
+NB_EPOCH = 500
 transformer = transforms.Compose([transforms.ToTensor(),
                                       transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5))])
 
@@ -36,8 +37,8 @@ def train(nb_epoch):
     net = vgg()
     criterion = CrossEntropyLoss()
     optimizer = Adam(net.parameters(), lr= 0.0001)
-    for eindex,epoch in enumerate(range(nb_epoch)):
-        start = datetime.datetime.now()
+    for epoch in range(nb_epoch):
+        start = time.clock()
         running_loss = 0.0
         for i, data in enumerate(trainloader):
             if i>10:
@@ -55,8 +56,8 @@ def train(nb_epoch):
                     print 'batch %d/%d of epoch %d: loss=%.3f'%(i, len(trainloader), epoch, running_loss)
             else:
                  print 'batch %d/%d of epoch %d: loss=%.3f'%(i,len(trainloader), epoch, running_loss)
-        end = datetime.datetime.now()
-        print "epoch{0} time:{1}".format(eindex,(start-end).strftime())
+        end = time.clock()
+        print "epoch{0} time:{1}".format(epoch,end-start)
     print 'Finished training'
     return net
 
@@ -71,13 +72,11 @@ def test(net):
 ##redirect output to file
 import datetime
 import sys
-report_file = "report_file_{0}.txt".format(str(datetime.datetime.now()))
+report_file = "../report/report_file_{0}.txt".format(str(datetime.datetime.now()))
 ini_stdout = sys.stdout
 with open(report_file,'w') as file:
     sys.stdout = file
-
-
-    net = train(2)
+    net = train(NB_EPOCH)
 
     correct_samples = np.zeros([len(classes),1]).ravel()
     total_samples = np.zeros_like(correct_samples)
