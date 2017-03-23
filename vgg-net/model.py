@@ -5,6 +5,9 @@ Created on Fri March 10 2017
 from torch.nn import Module
 from torch import nn
 import torch.nn.functional as F
+import torch
+import time
+
 class vgg(Module):
     # initialization
     def __init__(self):
@@ -42,4 +45,8 @@ class vgg(Module):
         x = self.dropout(F.relu(self.fc2(x)))
         x = self.softmax(self.fc3(x))
         return x
+
+    def save(self):
+        save_path = 'model_%s' % time.strftime('%Y-%m-%d-%H:%M', time.localtime(time.time()))
+        torch.save(self, save_path)
 

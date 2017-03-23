@@ -10,7 +10,7 @@ import numpy as np
 import time
 VERBOSE = True
 BATCH_SIZE = 4
-
+SAVE_PATH = time.strftime('%Y-%m-%d-%H:%M', time.localtime(time.time()))
 NB_EPOCH = 500
 transformer = transforms.Compose([transforms.ToTensor(),
                                       transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5))])
@@ -72,12 +72,15 @@ def test(net):
 ##redirect output to file
 import datetime
 import sys
+import os
+os.system('mkdir %s'%'../report')
 report_file = "../report/report_file_{0}.txt".format(str(datetime.datetime.now()))
 ini_stdout = sys.stdout
+
 with open(report_file,'w') as file:
     sys.stdout = file
     net = train(NB_EPOCH)
-
+    torch.save(net, SAVE_PATH)
     correct_samples = np.zeros([len(classes),1]).ravel()
     total_samples = np.zeros_like(correct_samples)
     for i,data in enumerate(testloader):
