@@ -11,7 +11,7 @@ import time
 VERBOSE = True
 BATCH_SIZE = 4
 SAVE_PATH = time.strftime('%Y-%m-%d-%H:%M', time.localtime(time.time()))
-NB_EPOCH = 500
+NB_EPOCH = 5
 transformer = transforms.Compose([transforms.ToTensor(),
                                       transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5))])
 
